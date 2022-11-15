@@ -162,7 +162,6 @@ if __name__ == '__main__':
 
     print(f"{len(initial_ids)} initial artists to start exploring from")
     artist_ids_to_visit.update(initial_ids)
-    print(len(artist_ids_to_visit))
 
     while True:
         try:
