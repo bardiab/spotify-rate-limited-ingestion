@@ -30,6 +30,8 @@ class SpotifyAccessTokenExpired(Exception):
 
 @retry(delay=5, tries=2)
 def get_auth_token():
+    if not SPOTIFY_CLIENT_ID or not SPOTIFY_CLIENT_SECRET:
+        raise KeyError("Missing Spotify developer credentials")
     client_str = f"{SPOTIFY_CLIENT_ID}:{SPOTIFY_CLIENT_SECRET}".encode('ascii')
     client_str = b64encode(client_str)
     client_str = client_str.decode('ascii')
@@ -160,6 +162,7 @@ if __name__ == '__main__':
 
     print(f"{len(initial_ids)} initial artists to start exploring from")
     artist_ids_to_visit.update(initial_ids)
+    print(len(artist_ids_to_visit))
 
     while True:
         try:
