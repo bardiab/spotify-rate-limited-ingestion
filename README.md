@@ -82,5 +82,4 @@ monitor outgoing requests to ensure we don't violate a threshold. However, we wo
 limit in order to maximize efficiency of using the algorithm. Since spotify doesn't provide an
 exact number of requests allowed per 30-second window, additional experimentation is required in order
 to estimate this number. Due to time constraints and rate limit constraints, I didn't pursue this option since
-I couldn't run enough experiments to get an accurate estimation of what our rate limit is.
-we wouldn't maximize efficiency from using the token bucket algorithm. 
+I couldn't run enough experiments to get an accurate estimation of what Spotify's rate limit is.
