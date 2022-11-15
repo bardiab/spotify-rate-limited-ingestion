@@ -5,9 +5,11 @@ Scrape all artists from the Spotify API as quickly as possible, while also desig
 around Spotify's rate limit in order to compute as fast as possible.
 
 ## How to run: 
+* Create Spotify developer account and [create an app](https://developer.spotify.com/dashboard/applications) 
 * set `CLIENT_ID` and `CLIENT_SECRET` from spotify developer account in .env file
 * Activate virtual environment `source venv/bin/activate`
-* Install package dependencies `pip install -r requirements.txt `
+* Install package dependencies `pip install -r requirements.txt`
+* Run with `python3 main.py`
 
 ## Spotify API Notes:
 * Spotify supports multiple authorization flows, and since this is a script that doesn't
@@ -54,31 +56,31 @@ artist ids from each playlist. Returns a list of unique artist ids from playlist
   * `requests_sent` int - how many requests we've sent to Spotify API
   * `artists` dict - maps `artist_id` to data about that artist
   * `artist_ids_to_visit` set - keeps track of which artist ids we have yet to explore from
-* To start, we used `get_featured_playlists` to get the Spotify's featured playlists
-and then from there we grabbed artists ids from tracks in those playlists
+* To start, we used `get_featured_playlists` to get Spotify's featured playlists
+and then from there we grabbed artists ids from tracks in those playlists.
 * These initial ids are what we use to start the scraping process. However, we still need some more
 info about each artist like genre, popularity, etc. so we used `get_several_artists` to batch 
 get this artist info with as few requests as possible.
 * With some IDs to start exploring, from each ID, we call `get_related_artists` which prints data
-for each unique new artist we haven't seen before, and stores info on ones we have yet to explore. We
-keep looping as long as we have artists we haven't explored from. 
-* In order to not hit the rate limit, we use `requests_sent` to sleep the script for 10 seconds 
-for every 500 requests we send. 
+for each unique new artist we haven't seen before, and stores which artists we have yet to explore. We
+keep looping as long as we have artists we haven't explored. 
+* In order to not hit the rate limit, we use `requests_sent` to sleep the script for 30 seconds 
+for every 1500 requests we send. 
   * I did a few rounds of estimation to come up with this number, and chose a more conservative sleep
   time to avoid hitting a 429 error.
 * We catch two exceptions: 
-  * If we hit the rate limit, we used a backoff-retry strategy where we wait the amount of seconds
+  * If we hit the rate limit, we use a backoff-retry strategy where we wait the amount of seconds
   specified by the retry-after header variable sent in the 429 response. 
   * If our access token expires, we set a new one. 
 
 
 ## Things to improve: 
-* Investigate if using Spotipy, a python client for Spotify's api, makes our script cleaner. I
-didn't use it at first in case I needed data the client could not provide. 
+* Investigate if using [Spotipy](https://spotipy.readthedocs.io/en/2.21.0/), a python client for Spotify's api,
+makes our script cleaner. I didn't use it at first in case I needed data the client could not provide. 
 * With more time, I would expand on the backoff-retry logic and use a token bucket algorithm to 
-monitor outgoing requests to ensure we don't violate a threshold. Since spotify doesn't provide an
+monitor outgoing requests to ensure we don't violate a threshold. However, we would need to know the rate 
+limit in order to maximize efficiency of using the algorithm. Since spotify doesn't provide an
 exact number of requests allowed per 30-second window, additional experimentation is required in order
-to estimate this number. Due to the limitations imposed on running more experiments from
-hitting 429 errors and time constraints, I didn't pursue this option since without
-an accurate estimation of what our rate limit is, we wouldn't maximize efficiency from using
-the token bucket algorithm. 
+to estimate this number. Due to time constraints and rate limit constraints, I didn't pursue this option since
+I couldn't run enough experiments to get an accurate estimation of what our rate limit is.
+we wouldn't maximize efficiency from using the token bucket algorithm. 

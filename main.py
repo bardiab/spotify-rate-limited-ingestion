@@ -173,12 +173,13 @@ if __name__ == '__main__':
                     print("~~ Delaying 30 seconds ~~")
                     print(datetime.strptime(current_time, fmt)
                           - datetime.strptime(start, fmt), f'time elapsed')
+                    print(f"Requests sent: {requests_sent}")
+                    print(f'Artist total - ', len(artists))
                     time.sleep(30)
 
                 next_id = artist_ids_to_visit.pop()
                 get_related_artists(artist_id=next_id)
-                print(f"Requests sent: {requests_sent}")
-                print(f'Artist total - ', len(artists))
+            print("No more artists to explore from")
 
         except SpotifyRateLimitError as e:
             wait_time = e.args[0].split(':')[1]
