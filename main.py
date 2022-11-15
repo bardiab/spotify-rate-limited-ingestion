@@ -111,9 +111,9 @@ def get_related_artists(artist_id: str):
     global artists
     for artist in json_data['artists']:
         a_id = artist.get('id')
-        artist_ids_to_visit.add(a_id)
 
         if a_id not in artists:
+            artist_ids_to_visit.add(a_id)
             artists[a_id] = {
                 "id": artist.get('id'),
                 "name": artist.get('name'),
@@ -163,25 +163,23 @@ if __name__ == '__main__':
     print(f"{len(initial_ids)} initial artists to start exploring from")
     artist_ids_to_visit.update(initial_ids)
 
-    while True:
+    while artist_ids_to_visit:
         try:
             while initial_ids:
                 get_several_artists(a_ids=initial_ids[:50])
                 initial_ids = initial_ids[50:]
 
-            while artist_ids_to_visit:
-                if requests_sent % 1500 == 0:
-                    current_time = time.strftime(fmt)
-                    print("~~ Delaying 30 seconds ~~")
-                    print(datetime.strptime(current_time, fmt)
-                          - datetime.strptime(start, fmt), f'time elapsed')
-                    print(f"Requests sent: {requests_sent}")
-                    print(f'Artist total - ', len(artists))
-                    time.sleep(30)
+            if requests_sent % 1500 == 0:
+                current_time = time.strftime(fmt)
+                print("~~ Delaying 30 seconds ~~")
+                print(datetime.strptime(current_time, fmt)
+                      - datetime.strptime(start, fmt), f'time elapsed')
+                print(f"Requests sent: {requests_sent}")
+                print(f'Artist total - ', len(artists))
+                time.sleep(30)
 
-                next_id = artist_ids_to_visit.pop()
-                get_related_artists(artist_id=next_id)
-            print("No more artists to explore from")
+            next_id = artist_ids_to_visit.pop()
+            get_related_artists(artist_id=next_id)
 
         except SpotifyRateLimitError as e:
             wait_time = e.args[0].split(':')[1]
